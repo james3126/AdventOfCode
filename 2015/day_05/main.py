@@ -1,4 +1,4 @@
-# Advent of Code - Year 2015 - Day 1
+# Advent of Code - Year 2015 - Day 5
 with open('input.txt', 'r') as f:
     puzzle_input = f.read()
 
