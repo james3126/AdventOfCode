@@ -34,8 +34,8 @@ def part_1():
 def part_2():
     # 1st card - 1 match = 1 extra copy of card 2
     # 1st card - n match = 1 extra copy of cards 2->n+1
-    # 3rd card - 5 match = 1 extra copy of cards 4->9
-    # x card - n match = 1 extra copy of cards x+1->x+n+1
+    # 3rd card - 5 match = copies_of_card(3) extra copy of cards 4->9
+    # x card - n match = copies_of_card([x+1->x+1+n]) = copies_of_card([x+1->x+1+n])+copies_of_card(x) for x >= 0 and n >= 0, else None
 
     # Hold the number of card copies for later. This will always start at 1, and increase from there.
     card_copies = [1 for i in range(len(puzzle_input.split('\n')))]
