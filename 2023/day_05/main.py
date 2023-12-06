@@ -143,7 +143,7 @@ def part_2():
 
     # Convert seeds input to int list, and then to a list containing [start,end] sub-lists
     seeds_inp = list(map(int, seeds_inp))
-    seeds_inp = calc_seed_ranges(seeds_inp)
+    seeds_inp_ranges = calc_seed_ranges(seeds_inp)
     # print(seeds_inp)
 
     # Save each maps range start and end, for destination and source as a list of tupples:
@@ -166,24 +166,24 @@ def part_2():
     def calc_lowest_range(ranges_to_check):
         lowest_value = ranges_to_check[0][0][0]
         for map_part in ranges_to_check:
-            print(map_part)
-            print(lowest_value,'<',map_part[0][0])
+            #print(map_part)
+            #print(lowest_value,'<',map_part[0][0])
             if map_part[0][0] < lowest_value:
                 #print("New lowest found",lowest_value,map_part)
                 lowest_value = map_part[0][0]
                 lowest_range = map_part[1]
 
-        print("LOWEST FOUND:",lowest_value,"WITH RANGE",lowest_range)
+        #print("LOWEST FOUND:",lowest_value,"WITH RANGE",lowest_range)
         return lowest_range
 
     # destination_to_check is passed as a [start_value, values] list
     # ranges_to_check contains a full map list of ranges using a list of tupples of sub [start_value, values] lists 
     def find_source_range_from_destination(destination_to_check,ranges_to_check):
-        print("Started")
+        #print("Started")
         valid_ranges = []
         for map_part in ranges_to_check:
-            print("DEST RANGE TO CHECK:        ",destination_to_check[0],'-',destination_to_check[0]+destination_to_check[1])
-            print("MAP RANGES TO CHECK AGAINST:",map_part[0][0],'-',map_part[0][0]+map_part[0][1])
+            #print("DEST RANGE TO CHECK:        ",destination_to_check[0],'-',destination_to_check[0]+destination_to_check[1])
+            #print("MAP RANGES TO CHECK AGAINST:",map_part[0][0],'-',map_part[0][0]+map_part[0][1])
 
             destination_range = [destination_to_check[0],destination_to_check[0]+destination_to_check[1]]
             source_range      = [map_part[0][0],map_part[0][0]+map_part[0][1]]
@@ -192,19 +192,19 @@ def part_2():
             # if destination_start >= source_start AND destination_start <= source_end AND destination_end <= source_end AND destination_end >= source_start
             if (destination_range[0] >= source_range[0]) and (destination_range[0] <= source_range[-1]) and (destination_range[-1] <= source_range[-1]) and (destination_range[-1] >= source_range[0]):
         	# destination_range falls entirely within the list.
-                print("ENTIRELY")
+                #print("ENTIRELY")
                 valid_ranges.append(source_range)
             elif (destination_range[0] >= source_range[0]) and (destination_range[0] <= source_range[-1]) and (destination_range[-1] > source_range[-1]):
                 # destination_range falls within the list, but extends beyond
-                print("PARTIALLY, BEYOND")
+                #print("PARTIALLY, BEYOND")
                 valid_ranges.append(([source_range[0],destination_range[-1]]))
             elif (destination_range[0] < source_range[0]) and (destination_range[-1] <= source_range[-1]) and (destination_range[-1] >= source_range[0]):
                 # destination_range falls within the list, but starts before
-                print("PARTIALLY, BEFORE")
+                #print("PARTIALLY, BEFORE")
                 valid_ranges.append(([destination_range[1],source_range[-1]]))
             else:
                 # destination_range does not fall within the list at all
-                print("NOT AT ALL")
+                #print("NOT AT ALL")
                 pass
 
         return valid_ranges
@@ -213,16 +213,71 @@ def part_2():
     # largest so we can re-calculate steps if the first solution finds a point where it does not fit
     
     lowest_location_humidity_range = calc_lowest_range(humidity_to_location_map_ranges)
+    #print("low:",lowest_location_humidity_range)
     valid_humidity_temperature_ranges = find_source_range_from_destination(lowest_location_humidity_range,temperature_to_humidity_map_ranges)
     
-    print(valid_humidity_temperature_ranges)
+    #print(valid_humidity_temperature_ranges)
 
     for valid_range in valid_humidity_temperature_ranges:
-        valid_temperature_light_ranges = find_source_range_from_destination(valid_humidity_temperature_ranges,light_to_temperature_map_ranges)
-        print(valid_temperature_light_ranges)
+        #print(valid_range)
+        valid_temperature_light_ranges = find_source_range_from_destination(valid_range,light_to_temperature_map_ranges)
+    # print(valid_temperature_light_ranges)
     
+    for valid_range in valid_temperature_light_ranges:
+        valid_light_water_ranges = find_source_range_from_destination(valid_range,water_to_light_map_ranges)
+    # print(valid_light_water_ranges)
 
+    for valid_range in valid_light_water_ranges:
+        valid_water_fertilizer_ranges = find_source_range_from_destination(valid_range,fertilizer_to_water_map_ranges)
+    print(valid_water_fertilizer_ranges)
 
+    for valid_range in valid_water_fertilizer_ranges:
+        valid_fertilizer_soil_ranges = find_source_range_from_destination(valid_range,soil_to_fertilizer_map_ranges)
+
+    for valid_range in valid_fertilizer_soil_ranges:
+        valid_soil_seeds_ranges = find_source_range_from_destination(valid_range,seeds_to_soil_map_ranges)
+
+    # Temporary re-format of the seeds_inp_ranges
+    # seeds_inp_ranges_formatted_as_map = []
+    # for seed_range in seeds_inp_ranges:
+    #     seeds_inp_ranges_formatted_as_map.append(([seed_range],[0,0]))
+
+    # We now have our final set of ranges. Now we can find what seeds fit into these ranges (using the same method)
+    
+    for valid_range in valid_soil_seeds_ranges:
+        valid_ranges = []
+        for seed_range in seeds_inp_ranges:
+            destination_range = valid_range
+            source_range = seed_range
+
+            #print("DEST:",destination_range)
+            #print("SOUR:",source_range)
+
+            # Logic to find whether any destination list fits within a source list without checking ranges of billions against billions
+            # if destination_start >= source_start AND destination_start <= source_end AND destination_end <= source_end AND destination_end >= source_start
+            if (destination_range[0] >= source_range[0]) and (destination_range[0] <= source_range[-1]) and (destination_range[-1] <= source_range[-1]) and (destination_range[-1] >= source_range[0]):
+                # destination_range falls entirely within the list.
+                #print("ENTIRELY")
+                valid_ranges.append(source_range)
+            elif (destination_range[0] >= source_range[0]) and (destination_range[0] <= source_range[-1]) and (destination_range[-1] > source_range[-1]):
+                # destination_range falls within the list, but extends beyond
+                #print("PARTIALLY, BEYOND")
+                valid_ranges.append(([source_range[0],destination_range[-1]]))
+            elif (destination_range[0] < source_range[0]) and (destination_range[-1] <= source_range[-1]) and (destination_range[-1] >= source_range[0]):
+                # destination_range falls within the list, but starts before
+                #print("PARTIALLY, BEFORE")
+                valid_ranges.append(([destination_range[1],source_range[-1]]))
+            else:
+                # destination_range does not fall within the list at all
+                #print("NOT AT ALL")
+                pass
+            
+            #print(valid_range)
+            #print("seed ranges:",seeds_inp_ranges)
+            #print("soil_seed ranges:",seeds_to_soil_map_ranges)
+            # valid_seed_ranges = find_source_range_from_destination(valid_range,seeds_inp_ranges_formatted_as_map)
+
+    print(valid_ranges)
 
     answer = ''
     print("Part 2: ",answer)
