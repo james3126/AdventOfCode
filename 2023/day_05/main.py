@@ -155,70 +155,46 @@ def part_2():
     temperature_to_humidity_map_ranges = list(map(calc_range_start_fin, temperature_to_humidity_map))
     humidity_to_location_map_ranges    = list(map(calc_range_start_fin, humidity_to_location_map))
 
-    # source_range_to_check is passed as a [start_value, values] list
-    # ranges_to_check contains a full map list of ranges using a list of tupples of sub [start_value, values] lists 
-    def find_sub_ranges(source_range_to_check,ranges_map):
-        valid_ranges = []
-        for map_part in ranges_map:
-            source_range      = source_range_to_check
-            destination_range = map_part[1]
-            #print(source_range, destination_range)
-            # Logic to find whether any source list fits within a destination list without checking ranges of billions against billions
-            # if source_start >= destination_start AND source_start <= destination_end AND source_end <= destination_end AND source_end >= destination_start
-            if (source_range[0] >= destination_range[0]) and (source_range[0] <= destination_range[-1]) and (source_range[-1] <= destination_range[-1]) and (source_range[-1] >= destination_range[0]):
-                # source_range falls entirely within the list.
-                # print("ENTIRELY")
+    def calc_destinations(source, current_map):
+        #print(current_map)
+        destination_number = None
+        for dest_range in current_map:
+            #print(dest_range)
+            if source >= dest_range[1][0] and source <= dest_range[1][1]:
+                source_delta = source - dest_range[1][0]
+                destination_number = source_delta + dest_range[0][0]
 
-                # Append entire converted range
-                start_num = source_range[1]-source_range[0]
-                converted_start = destination_range[0]+start_num
-                converted_end   = converted_start+start_num
+        if not destination_number:
+            destination_number = source
 
-                valid_ranges.append(([converted_start,converted_end]))
-            elif (source_range[0] >= destination_range[0]) and (source_range[0] <= destination_range[-1]) and (source_range[-1] > destination_range[-1]):
-                # source_range falls within the list, but extends beyond
-                print("PARTIALLY, BEYOND")
+        #print(destination_number)
 
-                excess = [destination_range[-1]+1,source_range[-1]]
-                valid_excess_ranges = find_sub_ranges(excess,ranges_map)
+        return destination_number
 
-                # Default back if nothing found
-                if len(valid_excess_ranges) == 0:
-                    valid_excess_ranges = excess
-                
-                valid_ranges.append(([destination_range[0],source_range[-1]],valid_excess_ranges))
-            elif (source_range[0] < destination_range[0]) and (source_range[-1] <= destination_range[-1]) and (source_range[-1] >= destination_range[0]):
-                # source_range falls within the list, but starts before
-                print("PARTIALLY, BEFORE")
 
-                excess = [source_range[1],destination_range[1]-1]
-                valid_excess_ranges = find_sub_ranges(excess,ranges_map)
 
-                # Default back if nothing found
-                if len(valid_excess_ranges) == 0:
-                    valid_excess_ranges = excess
-                
-                valid_ranges.append(([source_range[1],destination_range[-1]],valid_excess_ranges))
-            else:
-                # source_range does not fall within the list at all
-                # print("NOT AT ALL")
-                pass
-
-        # If no valid ranges are found, then the entire range can be passed through as an "as is" input
-        # if len(valid_ranges) == 0:
-        #     valid_ranges.append(([source_range[0],source_range[1]]))
-
-        return valid_ranges
-
-    valid_soil_ranges = []
+    locations_list = []
     for seed_range in seeds_inp_ranges:
-        #print(seed_range)
-        valid_soil_ranges.append(find_sub_ranges(seed_range,seeds_to_soil_map_ranges))
-        #print(x)
+        print("Range:",seed_range)
+        current_seed = seed_range[0]
+        while current_seed < seed_range[1]:
+            current_seed += 1
+            next_inp = calc_destinations(current_seed, seeds_to_soil_map_ranges)
+            next_inp = calc_destinations(next_inp, soil_to_fertilizer_map_ranges)
+            next_inp = calc_destinations(next_inp, fertilizer_to_water_map_ranges)
+            next_inp = calc_destinations(next_inp, water_to_light_map_ranges)
+            next_inp = calc_destinations(next_inp, light_to_temperature_map_ranges)
+            next_inp = calc_destinations(next_inp, temperature_to_humidity_map_ranges)
+            location = calc_destinations(next_inp, humidity_to_location_map_ranges)
 
-    print(valid_soil_ranges)
+            locations_list.append(location)
 
-    answer = ''
+            # Reset locations
+            if current_seed % 100000 == 0:
+                print(current_seed,'/',seed_range[1])
+                locations_list = [min(locations_list)]
+
+    answer = min(global_locations_list)
     print("Part 2: ",answer)
 
 if __name__ == "__main__":
