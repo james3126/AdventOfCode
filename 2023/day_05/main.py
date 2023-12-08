@@ -194,7 +194,7 @@ def part_2():
                 print(current_seed,'/',seed_range[1])
                 locations_list = [min(locations_list)]
 
-    answer = min(global_locations_list)
+    answer = min(locations_list)
     print("Part 2: ",answer)
 
 if __name__ == "__main__":
