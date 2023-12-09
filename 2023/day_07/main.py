@@ -43,19 +43,19 @@ def part_1():
         # print(sorted_hand)
 
         if re.match(r"^(.)\1{4}",sorted_hand): # Five of a Kind
-            hand_type = 0
+            hand_type = 6
         elif re.match(r"^(.)\1{3}(?!\1)(.)",sorted_hand): # Four of a kind
-            hand_type = 1
+            hand_type = 5
         elif re.match(r"^(.)\1{2}(?!\1)(.)\2",sorted_hand): # Full house
-            hand_type = 2
+            hand_type = 4
         elif re.match(r"^(.)\1{2}(?!\1)(.)(?!\1)(?!\2)(.)",sorted_hand): # Three of a kind
             hand_type = 3
         elif re.match(r"^(.)\1(?!\1)(.)\2(?!\1)(?!\2)(.)",sorted_hand): # Two Pair
-            hand_type = 4
+            hand_type = 2
         elif re.match(r"^(.)\1(?!\1)(.)(?!\1)(?!\2)(.)(?!\1)(?!\2)(?!\3)(.)",sorted_hand): # One pair
-            hand_type = 5
+            hand_type = 1
         else: # High Card (r"^(.)(?!\1)(.)(?!\1)(?!\2)(.)(?!\1)(?!\2)(?!\3)(.)(?!\1)(?!\2)(?!\3)(?!\4)(.)")
-            hand_type = 6
+            hand_type = 0
 
         card_strengths_list.append((points_list,bet,hand_type))
 
