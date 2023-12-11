@@ -39,7 +39,6 @@ def findExtrapolatedValue(og_sequence,delta_sequence):
 
 def part_1():
     running_total = 0
-    second_tot = 0
     for sequence in puzzle_input:
         sequence = formatSequenceToList(sequence)
         og_sequence = sequence.copy()
@@ -62,8 +61,25 @@ def part_1():
     print("Part 1: ",running_total)
 
 def part_2():
-    answer = ''
-    print("Part 2: ",answer)
+    running_total = 0
+    for sequence in puzzle_input:
+        sequence = formatSequenceToList(sequence)
+        sequence.reverse() # This was easy ...
+        og_sequence = sequence.copy()
+
+        delta_list = []
+        while checkIfSequenceZeros(sequence) != True:
+            sequence = findDiffBetweenVals(sequence)
+            delta_list.append(sequence[-1])
+
+        delta_list.reverse()
+
+        extrapolated_value = findExtrapolatedValue(og_sequence,delta_list)
+        running_total += extrapolated_value
+
+
+
+    print("Part 2: ",running_total)
 
 if __name__ == "__main__":
     part_1()
